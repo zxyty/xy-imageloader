@@ -1,0 +1,23 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+
+# production
+/dist
+/docs
+/storybook-static
+/lib
+
+# misc
+.DS_Store
+npm-debug.log*
+.editorconfig
+/.idea
+debug.log
+yarn-error.log
+yarn.lock
+
+/_site
+/.vscode
+Test.stories.*

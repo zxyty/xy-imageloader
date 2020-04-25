@@ -1,0 +1,33 @@
+{
+    "name": "xy-imageloader",
+    "version": "1.0.0",
+    "main": "lib/index.js",
+    "license": "MIT",
+    "scripts": {
+        "compile": "rimraf lib&&cross-env BABEL_ENV=production babel ./src --out-dir lib  --extensions .ts,.tsx,.js --copy-files --ignore spec.js,test.js && tsc -p ./tsconfig.prod.json"
+    },
+    "author": "zxy",
+    "description": "图片加载器 模板图像匹配",
+    "keywords": [
+        "image",
+        "loader",
+        "模板匹配",
+        "图像匹配"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zxyty/xy-imageloader.git"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.8.4",
+        "@babel/core": "^7.9.0",
+        "@babel/preset-env": "^7.9.5",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "@babel/preset-typescript": "^7.9.0",
+        "@babel/preset-react": "^7.9.4",
+        "babel-loader": "^8.1.0",
+        "cross-env": "^7.0.2",
+        "rimraf": "^3.0.2",
+        "typescript": "^3.8.3"
+    }
+}

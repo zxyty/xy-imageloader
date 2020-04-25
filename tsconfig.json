@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "target": "es5",
+    "module": "commonjs",
+    "noEmit": true,
+    "lib": ["es5", "es6", "es7", "es2017", "dom"],
+    "outDir": "./lib/",
+    "declaration": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "lib"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
