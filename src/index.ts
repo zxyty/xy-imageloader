@@ -81,7 +81,8 @@ export const getRGBColor = (imageData: ImageData) => {
   return returnColor;
 };
 
-// rgb: [[r,g,b],[r,g,b], ...];
+// input rgb: [[r,g,b],[r,g,b], ...];
+// return [x1, x2, x3, ...];
 export const rgbToGary = (rgb: number[][] | ImageData) => {
   let validRgb = rgb;
   if (validRgb instanceof ImageData) {
