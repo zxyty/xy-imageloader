@@ -12,16 +12,21 @@ const imgLoader = (src: string): Promise<HTMLImageElement> => {
   });
 };
 
-export const loadCanvas = async (source: string | HTMLImageElement) => {
+/**
+ * image加载canvas
+ * @param source string | HTMLImageElement
+ * @param compressWidth 是否压缩 n * n
+ */
+export const loadCanvas = async (source: string | HTMLImageElement, compressWidth?: number) => {
   let imgTarget = source;
   const handleDrawImage = (target: HTMLImageElement) => {
     const canvasEle = document.createElement("canvas");
     const canvasCtx = canvasEle.getContext("2d");
 
-    canvasEle.width = target.width;
-    canvasEle.height = target.height;
+    canvasEle.width = compressWidth || target.width;
+    canvasEle.height = compressWidth || target.height;
 
-    canvasCtx?.drawImage(target, 0, 0);
+    canvasCtx?.drawImage(target, 0, 0, canvasEle.width, canvasEle.height);
 
     return canvasEle;
   };
@@ -125,7 +130,7 @@ export const OtsuAlgorithm = (src: number[] = []) => {
   let varMax = 0;
   let threshold = 0;
 
-  for (let t = 0; t < 256; t+=1) {
+  for (let t = 0; t < 256; t += 1) {
     wB += histData[t];
     if (wB === 0) {
       continue;
@@ -146,7 +151,7 @@ export const OtsuAlgorithm = (src: number[] = []) => {
       threshold = t;
     }
   }
-  
+
   return threshold;
 };
 
@@ -154,9 +159,10 @@ export const OtsuAlgorithm = (src: number[] = []) => {
  * 转换为二值图像
  * @param imageData ImageData 图像数据
  * @param threshold number 阈值 默认125
+ * @param cropBoundary boolean 是否去除边界无效区
  */
-export const convertBinarization = (imageData: ImageData, threshold = 125) => {
-  for (let i = 0; i < imageData.data.length; i +=4 ) {
+export const convertBinarization = (imageData: ImageData, threshold = 125, cropBoundary = false) => {
+  for (let i = 0; i < imageData.data.length; i += 4) {
 
     // 先转灰度值
     const grayColor = parseInt(
@@ -169,7 +175,57 @@ export const convertBinarization = (imageData: ImageData, threshold = 125) => {
     imageData.data[i + 2] = shouldValue;
   }
 
-  return imageData;
+  if (!cropBoundary) {
+    return imageData;
+  }
+
+  const { width, height } = imageData;
+  let startX = Infinity;
+  let endX = 0;
+  let startY = Infinity;
+  let endY = 0;
+  // 以0为有效值
+  // 求出边界超出范围
+  for (let i = 0; i < height; i++) {
+    for (let j = 0; j < width; j++) {
+      const offset = (i * width + j) * 4;
+      if (imageData.data[offset] === 0) {
+        if (i < startY) {
+          startY = i;
+        }
+        if (i > endY) {
+          endY = i;
+        }
+        if (j > endX) {
+          endX = j;
+        }
+        if (j < startX) {
+          startX = j;
+        }
+      }
+    }
+  }
+
+  const cropedWidth = endX - startX + 1;
+  const cropedHeight = endY - startY + 1;
+
+  const newImageData = new ImageData(cropedWidth, cropedHeight);
+
+  for (let j = startY, shouldM = 0; j <= endY; j++, shouldM++) {
+    for (let i = startX, shouldN = 0; i <= endX; i++, shouldN++) {
+
+      const offset = (j * width + i) * 4;
+      const realOffset = (shouldM * width + shouldN) * 4;
+      const pxValue = imageData.data[offset];
+      const pxValueAlpha = imageData.data[offset + 3];
+      newImageData.data[realOffset] = pxValue;
+      newImageData.data[realOffset + 1] = pxValue;
+      newImageData.data[realOffset + 2] = pxValue;
+      newImageData.data[realOffset + 3] = pxValueAlpha;
+    }
+  }
+
+  return newImageData;
 }
 
 /**
@@ -199,7 +255,7 @@ export const convertMedian = (imageData: ImageData, size = 3, count = 1) => {
             const tValueR = imageData.data[tempPix];
             const tValueG = imageData.data[tempPix + 1];
             const tValueB = imageData.data[tempPix + 2];
-            
+
             tempR.push(tValueR);
             tempG.push(tValueG);
             tempB.push(tValueB);
@@ -219,7 +275,7 @@ export const convertMedian = (imageData: ImageData, size = 3, count = 1) => {
   for (let i = 0; i < count; i += 1) {
     convert(imageData, size);
   }
-  
+
   return imageData;
 }
 
@@ -234,7 +290,7 @@ export const convertAverage = (imageData: ImageData, size = 3, count = 1) => {
   const { width: tWidth, height: tHeight } = imageData;
   const sWidth = size;
   const sHeight = size;
-  
+
   const convert = (imageData: ImageData, size = 3) => {
     for (let th = 0; th < tHeight; th += 1) {
       for (let tW = 0; tW < tWidth; tW += 1) {
@@ -251,7 +307,7 @@ export const convertAverage = (imageData: ImageData, size = 3, count = 1) => {
             const tValueR = imageData.data[tempPix];
             const tValueG = imageData.data[tempPix + 1];
             const tValueB = imageData.data[tempPix + 2];
-            
+
             tempRSum += tValueR;
             tempGSum += tValueG;
             tempBSum += tValueB;
@@ -273,7 +329,7 @@ export const convertAverage = (imageData: ImageData, size = 3, count = 1) => {
   for (let i = 0; i < count; i += 1) {
     convert(imageData, size);
   }
-  
+
   return imageData;
 }
 
