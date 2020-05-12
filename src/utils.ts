@@ -302,13 +302,12 @@ export const getTemplatePos = (
 
 /**
  * 比较两幅图片得到 不同处的坐标
- * @param source1 ImageData
- * @param source2 ImageData
+ * @param source1 ImageData 二值图像
+ * @param source2 ImageData 二值图像
  */
 export const compareImage = (source1: ImageData, source2: ImageData) => {
   // 去到相同背景
   const leftDataImage: any[] = [];
-  // const newImageData = new ImageData(source1.width, source1.height);
   const { width, height } = source1;
   for (let i = 0; i < height; i++) {
     leftDataImage.push([]);
@@ -325,19 +324,9 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
       if (r1 === r2 && g1 === g2 && b1 === b2) {
         // 相同则去掉像素值
         // 保留成0
-        // leftDataImage[i][j] = 0;
-        // newImageData.data[offset] = 255;
-        // newImageData.data[offset + 1] = 255;
-        // newImageData.data[offset + 2] = 255;
-        // newImageData.data[offset + 3] = 255;
         leftDataImage[i].push(0);
       } else {
         // 不同保留成255
-        // leftDataImage[i][j] = 255;
-        // newImageData.data[offset] = 0;
-        // newImageData.data[offset + 1] = 0;
-        // newImageData.data[offset + 2] = 0;
-        // newImageData.data[offset + 3] = 255;
         leftDataImage[i].push(255);
       }
     }
@@ -372,7 +361,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
       if (foundNode[`${tplI}_${tplJ}`]) {
         break;
       }
-      // foundNode[`${tplI}_${tplJ}`] = true;
       const east = leftDataImage[tplI][tplJ + 1] || 0;
       foundNode[`${tplI}_${tplJ + 1}`] = true;
       if (east !== 0) {
@@ -391,7 +379,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
       if (foundNode[`${tplI}_${tplJ}`]) {
         break;
       }
-      // foundNode[`${tplI}_${tplJ}`] = true;
       const north = tplI <= 0 ? 0 : leftDataImage[tplI - 1][tplJ] || 0;
       foundNode[`${tplI - 1}_${tplJ}`] = true;
       if (north !== 0) {
@@ -410,7 +397,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
       if (foundNode[`${tplI}_${tplJ}`]) {
         break;
       }
-      // foundNode[`${tplI}_${tplJ}`] = true;
       const north =
         tplI >= source1.height - 1 ? 0 : leftDataImage[tplI + 1][tplJ] || 0;
       foundNode[`${tplI + 1}_${tplJ}`] = true;
@@ -433,7 +419,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
         if (foundNode[`${tplI}_${tplJ}`]) {
           break;
         }
-        // foundNode[`${tplI}_${tplJ}`] = true;
         const northeast = leftDataImage[tplI - 1][tplJ + 1] || 0;
         foundNode[`${tplI - 1}_${tplJ + 1}`] = true;
         if (northeast !== 0) {
@@ -456,7 +441,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
         if (foundNode[`${tplI}_${tplJ}`]) {
           break;
         }
-        // foundNode[`${tplI}_${tplJ}`] = true;
         const northwest = leftDataImage[tplI - 1][tplJ - 1] || 0;
         foundNode[`${tplI - 1}_${tplJ - 1}`] = true;
         if (northwest !== 0) {
@@ -479,7 +463,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
         if (foundNode[`${tplI}_${tplJ}`]) {
           break;
         }
-        // foundNode[`${tplI}_${tplJ}`] = true;
         const southeast = leftDataImage[tplI + 1][tplJ + 1] || 0;
         foundNode[`${tplI + 1}_${tplJ + 1}`] = true;
         if (southeast !== 0) {
@@ -502,7 +485,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
         if (foundNode[`${tplI}_${tplJ}`]) {
           break;
         }
-        // foundNode[`${tplI}_${tplJ}`] = true;
         const southwest = leftDataImage[tplI + 1][tplJ - 1] || 0;
         foundNode[`${tplI + 1}_${tplJ - 1}`] = true;
         if (southwest !== 0) {
@@ -515,23 +497,6 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
         }
       }
     }
-
-    // if (left > 0 && !foundNode[`${i}_${j - 1}`]) {
-    //   const tpl = getBoundaryNodes(i, j - 1) || [];
-    //   returnArr.push({ i, j: j - 1 }, ...tpl);
-    // }
-    // if (right > 0 && !foundNode[`${i}_${j + 1}`]) {
-    //   const tpl = getBoundaryNodes(i, j + 1) || [];
-    //   returnArr.push({ i, j: j + 1 }, ...tpl);
-    // }
-    // if (top > 0 && !foundNode[`${i - 1}_${j}`]) {
-    //   const tpl = getBoundaryNodes(i - 1, j) || [];
-    //   returnArr.push({ i: i - 1, j }, ...tpl);
-    // }
-    // if (bottom > 0 && !foundNode[`${i + 1}_${j}`]) {
-    //   const tpl = getBoundaryNodes(i + 1, j) || [];
-    //   returnArr.push({ i: i + 1, j }, ...tpl);
-    // }
 
     return returnArr;
   };
@@ -627,8 +592,12 @@ export const compareImage = (source1: ImageData, source2: ImageData) => {
   return mergeDifferent(different);
 };
 
-// box
-const checkIsCrossBox = (box1, box2) => {
+/**
+ * 判断两矩形是否相交
+ * @param box1 矩形1 {x, y, w, h}
+ * @param box2 矩形2 
+ */
+export const checkIsCrossBox = (box1, box2) => {
   const maxX =
     box1.x + box1.w >= box2.x + box2.w ? box1.x + box1.w : box2.x + box2.w;
   const maxY =
@@ -642,7 +611,12 @@ const checkIsCrossBox = (box1, box2) => {
   return false;
 };
 
-const getMergeBoundary = (box1, box2) => {
+/**
+ * 得到两矩形合并后边界大小
+ * @param box1 矩形1 {x, y, w, h}
+ * @param box2 矩形2 
+ */
+export const getMergeBoundary = (box1, box2) => {
   const maxX =
     box1.x + box1.w >= box2.x + box2.w ? box1.x + box1.w : box2.x + box2.w;
   const maxY =
