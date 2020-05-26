@@ -90,6 +90,23 @@ async componentDidMount() {
 }
 ```
 
+* 图片边缘扩展
+```tsx
+// 可以扩展边缘为 空缺（黑） | 边缘复制 | 边缘镜像
+getImageData("./lena.png").then(data => {
+  const newImageData = borderExpand(data, "BORDER_REPLICATE", 33);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = newImageData.width;
+  canvas.height = newImageData.height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.putImageData(newImageData, 0, 0);
+
+  document.body.insertBefore(canvas, document.body.children[0]);
+});
+```
+
 ### API
 * index.ts
 ```ts
@@ -157,7 +174,7 @@ export declare const getTemplatePos: (template: any, search: any, tWidth: any, t
 export declare const compareImage: (source1: ImageData, source2: ImageData) => any;
 ```
 
-* libg/morphology.js
+* lib/morphology.js
 ```ts
 /**
  * 膨胀
@@ -171,4 +188,17 @@ export declare const dilate: (imageData: ImageData, size?: number) => ImageData;
  * @param size default 3 表示 3 * 3的mat, 请传大于1的奇数
  */
 export declare const erode: (imageData: ImageData, size?: number) => ImageData;
+```
+
+* lib/border.js
+```ts
+declare type BorderType = "BORDER_REPLICATE" | "BORDER_REFLECT" | "BORDER_CONSTANT";
+/**
+ * 边缘信息扩展
+ * @param imageData src 图像信息
+ * @param borderType BORDER_REPLICATE | BORDER_REFLECT | BORDER_CONSTANT 默认为BORDER_REPLICATE
+ * @param size 扩展核大小size 正奇数 默认3
+ * @returns ImageData 新的imageData
+ */
+export declare const borderExpand: (imageData: ImageData, borderType?: BorderType, size?: number) => ImageData;
 ```

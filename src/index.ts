@@ -19,12 +19,12 @@ const imgLoader = (src: string): Promise<HTMLImageElement> => {
  */
 export const loadCanvas = async (
   source: string | HTMLImageElement,
-  compressWidth?: number,
+  compressWidth?: number
 ): Promise<HTMLCanvasElement> => {
   let imgTarget = source;
   const handleDrawImage = (target: HTMLImageElement) => {
-    const canvasEle = document.createElement('canvas');
-    const canvasCtx = canvasEle.getContext('2d');
+    const canvasEle = document.createElement("canvas");
+    const canvasCtx = canvasEle.getContext("2d");
 
     canvasEle.width = compressWidth || target.width;
     canvasEle.height = compressWidth || target.height;
@@ -36,7 +36,7 @@ export const loadCanvas = async (
   };
   return new Promise((resolve, reject) => {
     try {
-      if (typeof source === 'string') {
+      if (typeof source === "string") {
         imgLoader(source).then(res => {
           imgTarget = res;
           const canvasEle = handleDrawImage(imgTarget);
@@ -44,7 +44,7 @@ export const loadCanvas = async (
         });
       } else {
         if (!(imgTarget instanceof HTMLImageElement)) {
-          throw new Error('loadCanvas error');
+          throw new Error("loadCanvas error");
         }
         const canvasEle = handleDrawImage(imgTarget);
         resolve(canvasEle);
@@ -56,12 +56,12 @@ export const loadCanvas = async (
 };
 
 export const getImageData = (
-  source: string | HTMLImageElement | HTMLCanvasElement,
-) => {
+  source: string | HTMLImageElement | HTMLCanvasElement
+): Promise<ImageData> => {
   if (source instanceof HTMLCanvasElement) {
     return new Promise(resolve => {
       const imageData = source
-        .getContext('2d')
+        .getContext("2d")
         ?.getImageData(0, 0, source.width, source.height);
       resolve(imageData);
     });
@@ -69,7 +69,7 @@ export const getImageData = (
   return new Promise(resolve => {
     loadCanvas(source).then((canvas: HTMLCanvasElement) => {
       const imageData = canvas
-        .getContext('2d')
+        .getContext("2d")
         ?.getImageData(0, 0, canvas.width, canvas.height);
       resolve(imageData);
     });
@@ -100,7 +100,7 @@ export const rgbToGary = (rgb: number[][] | ImageData) => {
   return validRgb.map(color => {
     return parseInt(
       String((299 * color[0] + 587 * color[1] + 114 * color[2]) / 1000),
-      10,
+      10
     );
   });
 };
@@ -169,7 +169,7 @@ export const OtsuAlgorithm = (src: number[] = []) => {
 export const convertBinarization = (
   imageData: ImageData,
   threshold = 125,
-  cropBoundary = false,
+  cropBoundary = false
 ) => {
   for (let i = 0; i < imageData.data.length; i += 4) {
     // 先转灰度值
@@ -178,9 +178,9 @@ export const convertBinarization = (
         (299 * imageData.data[i] +
           587 * imageData.data[i + 1] +
           114 * imageData.data[i + 2]) /
-          1000,
+          1000
       ),
-      10,
+      10
     );
     const shouldValue = grayColor >= threshold ? 255 : 0;
     imageData.data[i] = shouldValue;
