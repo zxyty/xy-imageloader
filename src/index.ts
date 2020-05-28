@@ -1,3 +1,5 @@
+import { CropType } from "./types";
+
 // image loader
 const imgLoader = (src: string): Promise<HTMLImageElement> => {
   return new Promise((res, rej) => {
@@ -73,6 +75,45 @@ export const getImageData = (
         ?.getImageData(0, 0, canvas.width, canvas.height);
       resolve(imageData);
     });
+  });
+};
+
+/**
+ * 裁剪图像区域
+ * @param image HTMLImageElement src 原图像
+ * @param crop 裁剪区域 optional
+ * @returns Promise<{url, file}>
+ */
+export const makeImageCrop = (image: HTMLImageElement, crop?: CropType) => {
+  const canvas = document.createElement("canvas");
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+  canvas.width = crop?.width || image.width;
+  canvas.height = crop?.height || image.height;
+  const ctx = canvas.getContext("2d")!;
+
+  ctx.drawImage(
+    image,
+    (crop?.x || 0) * scaleX,
+    (crop?.y || 0) * scaleY,
+    (crop?.width || image.width) * scaleX,
+    (crop?.height || image.height) * scaleY,
+    0,
+    0,
+    crop?.width || image.width,
+    crop?.height || image.height
+  );
+
+  return new Promise(resolve => {
+    const fileName = "newCropImg.jpg";
+    canvas.toBlob((blob: Blob) => {
+      blob.name = fileName;
+      // eslint-disable-next-line no-new
+      const cropFile = new File([blob], fileName, {
+        type: "image/jpeg"
+      });
+      resolve({ url: window.URL.createObjectURL(blob), file: cropFile });
+    }, "image/jpeg");
   });
 };
 
