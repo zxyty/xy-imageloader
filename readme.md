@@ -16,6 +16,7 @@ getImageData("./lena.png").then(imageData => {
 * 模板匹配示例
 ```tsx
 import imgLoader, { getImageData, rgbToGary } from 'xy-imageloader';
+import rgbToGary from 'xy-imageloader/lib/color';
 import { getTemplatePos } from 'xy-imageloader/lib/util';
 
 Promise.all([imgLoader("./lena.png"), imgLoader("./search.png")]).then(
@@ -107,98 +108,22 @@ getImageData("./lena.png").then(data => {
 });
 ```
 
-### API
-* index.ts
-```ts
-declare const imgLoader: (src: string) => Promise<HTMLImageElement>;
-/**
- * image加载canvas
- * @param source string | HTMLImageElement
- * @param compressWidth 是否压缩 n * n
- */
-export declare const loadCanvas: (source: string | HTMLImageElement, compressWidth?: number | undefined) => Promise<HTMLCanvasElement>;
-export declare const getImageData: (source: string | HTMLImageElement | HTMLCanvasElement) => Promise<unknown>;
-export declare const getRGBColor: (imageData: ImageData) => number[][];
-export declare const rgbToGary: (rgb: ImageData | number[][]) => number[];
-/**
- * 大津法取阈值
- * @param src 灰度值[x1,x2,x3,...]
- */
-export declare const OtsuAlgorithm: (src?: number[]) => number;
-/**
- * 转换为二值图像
- * @param imageData ImageData 图像数据
- * @param threshold number 阈值 默认125
- * @param cropBoundary boolean 是否去除边界无效区
- * @returns 返回 imageData | [imageData, <offsetX>, <offsetY>]
- */
-export declare const convertBinarization: (imageData: ImageData, threshold?: number, cropBoundary?: boolean) => (number | ImageData)[];
-/**
- * 转换为中值滤波图像
- * @param imageData ImageData 图像数据
- * @param size 滤波大小 默认3 需大于等于3的奇数
- * @param count 迭代次数
- */
-export declare const convertMedian: (imageData: ImageData, size?: number, count?: number) => ImageData;
-/**
- * 转换为均值滤波图像
- * @param imageData ImageData 图像数据
- * @param size 滤波大小 默认3 需大于等于3的奇数
- * @param count 迭代次数
- */
-export declare const convertAverage: (imageData: ImageData, size?: number, count?: number) => ImageData;
-export default imgLoader;
+* Sobel算子提取图像边缘
+```tsx
+import imageLoader, { getImageData } from 'xy-imageloader';
+import { convertSobel } from 'xy-imageloader/lib/filter';
+
+imageLoader('./122.png').then(async res => {
+  const imageData = await getImageData(res);
+  const data = convertSobel(imageData);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = data.width;
+  canvas.height = data.height;
+  const ctx = canvas.getContext('2d');
+  ctx?.putImageData(data, 0, 0);
+
+  document.body.appendChild(canvas);
+});
 ```
 
-* lib/util.ts
-```ts
-/**
- * cv 模板匹配搜索位置
- * @param template 匹配的图片灰度值[x,x,x,...] w * h 长度的灰度图片数据
- * @param search 搜索的图片灰度值[x,x,x,...] w * h 长度的灰度图片数据
- * @param tWidth 匹配图片的width
- * @param tHeight 匹配图片的height
- * @param sWidth 搜索图片的width
- * @param sHeight 搜索图片的height
- * @param type 匹配方式
- */
-export declare const getTemplatePos: (template: any, search: any, tWidth: any, tHeight: any, sWidth: any, sHeight: any, type?: "CV_TM_SQDIFF" | "CV_TM_SQDIFF_NORMED" | "CV_TM_CCORR" | "CV_TM_CCORR_NORMED" | "CV_TM_CCOEFF" | "CV_TM_CCOEFF_NORMED" | undefined) => {
-    x: number;
-    y: number;
-};
-/**
- * 比较两幅图片得到 不同处的坐标
- * @param source1 ImageData
- * @param source2 ImageData
- */
-export declare const compareImage: (source1: ImageData, source2: ImageData) => any;
-```
-
-* lib/morphology.js
-```ts
-/**
- * 膨胀
- * @param imageData ImageData
- * @param size default 3 表示 3 * 3的mat, 请传大于1的奇数
- */
-export declare const dilate: (imageData: ImageData, size?: number) => ImageData;
-/**
- * 腐蚀
- * @param imageData ImageData
- * @param size default 3 表示 3 * 3的mat, 请传大于1的奇数
- */
-export declare const erode: (imageData: ImageData, size?: number) => ImageData;
-```
-
-* lib/border.js
-```ts
-declare type BorderType = "BORDER_REPLICATE" | "BORDER_REFLECT" | "BORDER_CONSTANT";
-/**
- * 边缘信息扩展
- * @param imageData src 图像信息
- * @param borderType BORDER_REPLICATE | BORDER_REFLECT | BORDER_CONSTANT 默认为BORDER_REPLICATE
- * @param size 扩展核大小size 正奇数 默认3
- * @returns ImageData 新的imageData
- */
-export declare const borderExpand: (imageData: ImageData, borderType?: BorderType, size?: number) => ImageData;
-```
