@@ -26,3 +26,22 @@ export const sobel5y = [
      2,  8, 12,  8,  2,
      1,  4,  6,  4,  1
 ];
+
+export const scharr3x = [
+    -3, 0, 3,
+    -10, 0, 10,
+    -3, 0, 3
+];
+
+export const scharr3y = [
+    -3, 10, 3,
+    0, 0, 0,
+    3, 10, 3
+];
+
+// 拉普拉斯算子
+export const laplacian3 = [
+    0, 1, 0,
+    1, -4, 1, 
+    0, 1, 0
+];
