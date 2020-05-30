@@ -1,4 +1,5 @@
-import { getLinearMatData, linearFilter } from 'xy-math/lib/linearFilter';
+import { getLinearMatData, linearFilter } from 'xy-math/lib/LinearFilter';
+import { getGaussBlurKernel } from 'xy-math/lib/GaussBlur';
 import { rgbToGary } from './color';
 import { sobel3x, sobel3y, sobel5x, sobel5y } from './kernel';
 import { borderExpand } from './border';
@@ -107,7 +108,7 @@ export const convertAverage = (imageData: ImageData, size = 3, count = 1) => {
 };
 
 /**
- * Sobel算子滤波
+ * Sobel模糊
  * @param source ImageData
  * @param kernelSize 滤波核大小 默认3 可取3或者5
  * @returns ImageData 图像数据
@@ -156,3 +157,75 @@ export const convertSobel = (source: ImageData, size: 3 | 5 = 3) => {
 
   return newData;
 };
+
+/**
+ * 高斯模糊
+ * @param source ImageData
+ * @param radius 默认3 可取3或者5
+ * @returns ImageData 图像数据
+ */
+export const convertGauss = (source: ImageData, radius: 3 | 5 = 3) => {
+  const gaussKernel = getGaussBlurKernel(radius, radius / 3);
+
+  const { width: tWidth, height: tHeight } = source;
+
+  const filterX = kernel => {
+    for (let i = 0; i < tHeight; i += 1) {
+      for (let j = 0; j < tWidth; j += 1) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let gaussSum = 0;
+        const index = (i * tWidth + j) * 4;
+        for(let n = -radius; n <= radius; n++){
+          let k = n + j;
+          const currIndex = (k + tWidth * i) * 4;
+          if (k >= 0 && k < tWidth){ //确保 k 没超出 width 的范围
+            r += kernel[n + radius] * source.data[currIndex];
+            g += kernel[n + radius] * source.data[currIndex + 1];
+            b += kernel[n + radius] * source.data[currIndex + 2];
+            gaussSum += kernel[n + radius];
+          }
+        }
+        source.data[index] = r / gaussSum;
+        source.data[index + 1] = g / gaussSum;
+        source.data[index + 2] = b / gaussSum;
+        source.data[index + 3] = source.data[index + 3];
+      }
+    }
+  };
+
+  const filterY = kernel => {
+    for (let i = 0; i < tWidth; i += 1) {
+      for (let j = 0; j < tHeight; j += 1) {
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let gaussSum = 0;
+        const index = (j * tWidth + i) * 4;
+        for(let n = -radius; n <= radius; n++){
+          let k = n + j;
+          const currIndex = (k * tWidth + i) * 4;
+          if (k >= 0 && k < tHeight){ //确保 k 没超出 width 的范围
+            r += kernel[n + radius] * source.data[currIndex];
+            g += kernel[n + radius] * source.data[currIndex + 1];
+            b += kernel[n + radius] * source.data[currIndex + 2];
+            gaussSum += kernel[n + radius];
+          }
+        }
+        source.data[index] = r / gaussSum;
+        source.data[index + 1] = g / gaussSum;
+        source.data[index + 2] = b / gaussSum;
+        source.data[index + 3] = source.data[index + 3];
+      }
+    }
+  };
+
+  // x 方向高斯模糊
+  filterX(gaussKernel);
+
+  // y 方向高斯模糊
+  filterY(gaussKernel);
+
+  return source;
+}

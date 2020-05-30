@@ -9,8 +9,6 @@ export const dilate = (imageData: ImageData, size = 3) => {
 
     const sWidth = size;
     const sHeight = size;
-    const newData = new ImageData(tWidth, tHeight);
-
 
     for (let th = 0; th < tHeight; th += 1) {
         for (let tW = 0; tW < tWidth; tW += 1) {
@@ -33,14 +31,14 @@ export const dilate = (imageData: ImageData, size = 3) => {
                 }
             }
 
-            newData.data[(th * tWidth + tW) * 4] = data[realOffset];
-            newData.data[(th * tWidth + tW) * 4 + 1] = data[realOffset + 1];
-            newData.data[(th * tWidth + tW) * 4 + 2] = data[realOffset + 2];
-            newData.data[(th * tWidth + tW) * 4 + 3] = data[realOffset + 3];
+            imageData.data[(th * tWidth + tW) * 4] = data[realOffset];
+            imageData.data[(th * tWidth + tW) * 4 + 1] = data[realOffset + 1];
+            imageData.data[(th * tWidth + tW) * 4 + 2] = data[realOffset + 2];
+            // newData.data[(th * tWidth + tW) * 4 + 3] = data[realOffset + 3];
         }
     }
 
-    return newData;
+    return imageData;
 }
 
 /**
@@ -55,7 +53,6 @@ export const erode = (imageData: ImageData, size = 3) => {
 
     const sWidth = size;
     const sHeight = size;
-    const newData = new ImageData(tWidth, tHeight);
 
     for (let th = 0; th < tHeight; th += 1) {
         for (let tW = 0; tW < tWidth; tW += 1) {
@@ -78,12 +75,12 @@ export const erode = (imageData: ImageData, size = 3) => {
                 }
             }
 
-            newData.data[(th * tWidth + tW) * 4] = data[realOffset];
-            newData.data[(th * tWidth + tW) * 4 + 1] = data[realOffset + 1];
-            newData.data[(th * tWidth + tW) * 4 + 2] = data[realOffset + 2];
-            newData.data[(th * tWidth + tW) * 4 + 3] = data[realOffset + 3];
+            imageData.data[(th * tWidth + tW) * 4] = data[realOffset];
+            imageData.data[(th * tWidth + tW) * 4 + 1] = data[realOffset + 1];
+            imageData.data[(th * tWidth + tW) * 4 + 2] = data[realOffset + 2];
+            // imageData.data[(th * tWidth + tW) * 4 + 3] = data[realOffset + 3];
         }
     }
 
-    return newData;
+    return imageData;
 }

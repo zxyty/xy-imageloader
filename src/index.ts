@@ -111,7 +111,7 @@ export const makeImageCrop = (image: HTMLImageElement, crop?: CropType) => {
   return new Promise(resolve => {
     const fileName = "newCropImg.jpg";
     canvas.toBlob((blob: Blob) => {
-      blob.name = fileName;
+      // blob.name = fileName;
       // eslint-disable-next-line no-new
       const cropFile = new File([blob], fileName, {
         type: "image/jpeg"
